@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carcaças Web - Gestor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Libre+Franklin:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="topBar">
+        <div class="topInner">
+            <div class="brand">
+                <h1>Carcaças Web - Gestor</h1>
+                <p>Organizador de Carcaças Remanufaturadas</p>
+                <p class="meta" id="metaImport"></p>
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="importarDados()">Atualizar vendas</button>
+                <button class="btn ghost hidden" id="btnLimpar" onclick="limparDados()">Limpar dados</button>
+            </div>
+        </div>
+    </header>
+
+    <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" />
+
+    <main class="wrap">
+        <!-- Estado vazio -->
+        <section class="empty" id="empty">
+            <h2>Nenhuma venda carregada</h2>
+            <p>Importe a planilha de vendas de carcaças (.xlsx) para gerar o painel. Você também pode arrastar o arquivo
+                para esta tela.</p>
+            <button class="btn" onclick="importarDados()">Importar planilha</button>
+        </section>
+
+        <!-- Dashboard -->
+        <div id="dash" class="hidden">
+            <section class="filters">
+                <div class="f"><label for="fDe">De</label><input type="text" id="fDe" placeholder="dd/mm/aaaa"
+                        inputmode="numeric" maxlength="10"></div>
+                <div class="f"><label for="fAte">Até</label><input type="text" id="fAte" placeholder="dd/mm/aaaa"
+                        inputmode="numeric" maxlength="10"></div>
+                <div class="f"><label for="fVend">Vendedor</label><select id="fVend"></select></div>
+                <div class="f"><label for="fMarca">Marca</label><select id="fMarca"></select></div>
+                <div class="f grow"><label for="fBusca">Buscar cliente, peça, nº da venda ou observação</label><input
+                        type="search" id="fBusca" placeholder="Ex.: Dunga, embreagem, 12345678"></div>
+                <div class="tabs" id="tabs" role="tablist" aria-label="Situação"></div>
+                <div class="chips" id="chips"></div>
+            </section>
+
+            <section class="kpis">
+                <div class="kpi">
+                    <div class="v" id="kCarc">0</div>
+                    <div class="l">Carcaças (itens vendidos)</div>
+                </div>
+                <div class="kpi">
+                    <div class="v" id="kVendas">0</div>
+                    <div class="l">Vendas distintas</div>
+                </div>
+                <div class="kpi">
+                    <div class="v" id="kClientes">0</div>
+                    <div class="l">Clientes atendidos</div>
+                </div>
+                <div class="kpi alert">
+                    <div class="v" id="kVelhas">0</div>
+                    <div class="l">Não concluídas há mais de 90 dias</div>
+                </div>
+            </section>
+
+            <section class="aging">
+                <div class="agingHead">
+                    <h2>Tempo desde a venda</h2>
+                    <span id="agingInfo">Clique numa faixa para filtrar</span>
+                </div>
+                <div class="ageBar" id="ageBar"></div>
+                <div class="ageLegend" id="ageLegend"></div>
+            </section>
+
+            <section class="grid g2">
+                <div class="panel">
+                    <h3>Carcaças por mês</h3>
+                    <p class="hint">Quantidade de itens vendidos em cada mês</p>
+                    <div class="chartBox"><canvas id="cMes"></canvas></div>
+                </div>
+                <div class="panel">
+                    <h3>Por vendedor</h3>
+                    <p class="hint">Clique numa barra para filtrar</p>
+                    <div class="chartBox"><canvas id="cVend"></canvas></div>
+                </div>
+            </section>
+
+            <section class="grid g3">
+                <div class="panel">
+                    <h3>Por marca</h3>
+                    <p class="hint">Clique numa barra para filtrar</p>
+                    <div class="chartBox"><canvas id="cMarca"></canvas></div>
+                </div>
+                <div class="panel">
+                    <h3>Peças mais vendidas</h3>
+                    <p class="hint">Top 10 por quantidade</p>
+                    <div class="chartBox"><canvas id="cPeca"></canvas></div>
+                </div>
+                <div class="panel">
+                    <h3>Principais clientes</h3>
+                    <p class="hint">Clique num cliente para filtrar</p>
+                    <ul class="rank" id="rankCli"></ul>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="tableHead">
+                    <h3 id="tblTitle">Vendas</h3>
+                    <button class="btn ghost" onclick="exportarCSV()">Exportar filtro (CSV)</button>
+                </div>
+                <div class="bulk hidden" id="bulk">
+                    <span id="bulkInfo"></span>
+                    <button class="btn ghost" data-bulk="pendente" onclick="acaoEmMassa('pendente')">Pendente</button>
+                    <button class="btn ghost" data-bulk="andamento" onclick="acaoEmMassa('andamento')">Em
+                        andamento</button>
+                    <button class="btn ghost" data-bulk="concluida"
+                        onclick="acaoEmMassa('concluida')">Concluída</button>
+                    <button class="btn ghost danger" data-bulk="excluida"
+                        onclick="acaoEmMassa('excluida')">Excluir</button>
+                    <button class="btn ghost" data-bulk="limpar" onclick="acaoEmMassa('limpar')">Limpar seleção</button>
+                </div>
+                <div class="tableScroll">
+                    <table>
+                        <thead>
+                            <tr id="thead"></tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+                <div class="pager">
+                    <button class="btn ghost" id="pgPrev">Anterior</button>
+                    <span id="pgInfo"></span>
+                    <button class="btn ghost" id="pgNext">Próxima</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <dialog class="obsDialog" id="obsDialog">
+        <h3>Observação</h3>
+        <p class="obsInfo" id="obsInfo"></p>
+        <label for="obsTexto" class="sr">Texto da observação</label>
+        <textarea id="obsTexto" rows="5"
+            placeholder="Ex.: cliente vai devolver a carcaça na próxima entrega"></textarea>
+        <p class="obsQuando" id="obsQuando"></p>
+        <div class="obsBtns">
+            <button class="btn ghost" id="obsCancelar">Cancelar</button>
+            <button class="btn" id="obsSalvar">Salvar observação</button>
+        </div>
+    </dialog>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Bibliotecas -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+    <!-- Scripts do sistema (a ordem importa: app.js sempre por último) -->
+    <script src="js/config.js"></script>
+    <script src="js/estado.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/armazenamento.js"></script>
+    <script src="js/importacao.js"></script>
+    <script src="js/filtros.js"></script>
+    <script src="js/painel.js"></script>
+    <script src="js/graficos.js"></script>
+    <script src="js/tabela.js"></script>
+    <script src="js/acompanhamento.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
