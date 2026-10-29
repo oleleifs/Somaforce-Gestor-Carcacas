@@ -911,3 +911,145 @@ th.chk input {
         transition: none !important;
     }
 }
+/* ---------- Cadastro de peças ---------- */
+.specBtn {
+    all: unset;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 3px;
+    font-size: .76rem;
+    color: #e6b35c;
+    font-variant-numeric: tabular-nums;
+}
+
+.specBtn.vazio {
+    color: #6d6d6d;
+}
+
+.specBtn:hover {
+    text-decoration: underline;
+}
+
+.specBtn:focus-visible {
+    outline: 2px solid var(--red3);
+    outline-offset: 2px;
+}
+
+.pecaCampos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.pecaCampo span {
+    display: block;
+    font-size: .8rem;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.pecaCampo em {
+    font-style: normal;
+    color: #6d6d6d;
+}
+
+.pecaCampo input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, .06);
+    border: 1.5px solid rgba(255, 255, 255, .1);
+    border-radius: 4px;
+    padding: 9px 12px;
+    color: #fff;
+    font-family: inherit;
+    font-size: .92rem;
+    outline: none;
+}
+
+.pecaCampo input:focus {
+    border-color: var(--red2);
+}
+
+/* ---------- Relatório ---------- */
+.relDialog {
+    width: min(720px, calc(100% - 32px));
+}
+
+.relGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.relGrid .f {
+    min-width: 0;
+}
+
+.relWide {
+    grid-column: 1 / -1;
+}
+
+.relLinks {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.lnk {
+    all: unset;
+    cursor: pointer;
+    font-size: .8rem;
+    color: #bbb;
+    text-decoration: underline;
+}
+
+.lnk:hover {
+    color: #fff;
+}
+
+.lnk:focus-visible {
+    outline: 2px solid var(--red3);
+    outline-offset: 2px;
+}
+
+.relSub {
+    margin-top: 18px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.relSecoes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+    margin-top: 8px;
+}
+
+.relChk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .88rem;
+    cursor: pointer;
+}
+
+.relChk input {
+    accent-color: var(--red2);
+    width: 16px;
+    height: 16px;
+}
+
+.relContagem {
+    margin-top: 14px;
+    font-size: .84rem;
+    color: #e6b35c;
+}
+
+@media (max-width: 560px) {
+    .relGrid,
+    .relSecoes {
+        grid-template-columns: 1fr;
+    }
+}

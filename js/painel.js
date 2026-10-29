@@ -35,6 +35,7 @@ function montarDashboard() {
     document.getElementById('empty').classList.add('hidden');
     document.getElementById('dash').classList.remove('hidden');
     document.getElementById('btnLimpar').classList.remove('hidden');
+    document.getElementById('btnRelatorio').classList.remove('hidden');
 
     if (meta) {
         const quando = new Date(meta.importadoEm);

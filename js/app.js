@@ -31,5 +31,20 @@ document.getElementById('obsSalvar').addEventListener('click', salvarObs);
 document.getElementById('obsCancelar').addEventListener('click', () => document.getElementById('obsDialog').close());
 document.getElementById('obsTexto').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) salvarObs(); });
 
+document.getElementById('pecaSalvar').addEventListener('click', salvarPeca);
+document.getElementById('pecaCancelar').addEventListener('click', () => document.getElementById('pecaDialog').close());
+document.getElementById('pecaCampos').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); salvarPeca(); } });
+
+// Relatório
+['rDe', 'rAte'].forEach(id => mascaraData(document.getElementById(id)));
+document.getElementById('relDialog').addEventListener('input', atualizarContagemRelatorio);
+document.getElementById('relDialog').addEventListener('change', atualizarContagemRelatorio);
+document.getElementById('relGerar').addEventListener('click', gerarRelatorioPDF);
+document.getElementById('relCancelar').addEventListener('click', () => document.getElementById('relDialog').close());
+document.getElementById('relTela').addEventListener('click', usarFiltrosDaTela);
+document.getElementById('relLimpar').addEventListener('click', limparFiltrosRelatorio);
+
+montarCamposPeca();
+carregarPecas();
 carregarAcomp();
 if (carregar()) montarDashboard();

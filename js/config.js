@@ -22,6 +22,18 @@ const COLUNAS = {
 };
 const OBRIGATORIAS = ['cliente', 'peca', 'vendedor', 'data'];
 
+// Dados técnicos memorizados por código de peça (cadastro de peças).
+// Para acrescentar um campo novo, basta incluir uma linha aqui:
+//   campo: nome interno · titulo: nome na tela e na exportação · unidade: aparece ao lado do valor
+//   aliases: nomes aceitos se a coluna vier na planilha importada
+const CAMPOS_PECA = [
+    { campo: 'mmCasco', titulo: 'MM do casco',      unidade: 'mm', exemplo: 'Ex.: 120',
+      aliases: ['mmcasco', 'mmdocasco', 'medidacasco', 'diametrocasco', 'casco'] },
+    { campo: 'nmRef',   titulo: 'Nm de referência', unidade: 'Nm', exemplo: 'Ex.: 45',
+      aliases: ['nmreferencia', 'nmdereferencia', 'nmref', 'nm', 'torquereferencia', 'torque'] }
+];
+const PECAS_KEY = STORAGE_KEY + '_pecas';
+
 // Situações possíveis de cada venda (sem registro = pendente)
 const STATUS = {
     pendente:  { label: 'Pendente' },

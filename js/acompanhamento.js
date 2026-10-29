@@ -93,6 +93,7 @@ document.getElementById('tbody').addEventListener('click', e => {
     if (!b) return;
     const id = b.dataset.id;
     if (b.dataset.acao === 'obs') abrirObs(id);
+    else if (b.dataset.acao === 'peca') abrirPeca(id);
     else if (b.dataset.acao === 'excluir') setStatus([id], 'excluida');
     else if (b.dataset.acao === 'restaurar') setStatus([id], 'pendente');
 });

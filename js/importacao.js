@@ -44,6 +44,8 @@ function processExcelData(bruto, nomeArquivo) {
         }
     }
 
+    const mapaPeca = mapearColunasPeca(cabecalhos);
+
     const faltando = OBRIGATORIAS.filter(c => !mapa[c]);
     if (faltando.length) {
         toast('Colunas não encontradas: ' + faltando.join(', ') + '. Confira o cabeçalho da planilha.', true);
@@ -67,11 +69,13 @@ function processExcelData(bruto, nomeArquivo) {
             data,
             dias: Math.max(0, Math.round((hoje - data) / 864e5)),
             _status: texto(l[mapa.status]),
-            _obs: texto(l[mapa.obs])
+            _obs: texto(l[mapa.obs]),
+            _specs: Object.fromEntries(Object.entries(mapaPeca).map(([campo, h]) => [campo, textoSpec(l[h])]))
         };
     }).filter(Boolean);
     gerarIds(dados);
     aplicarAcompDaPlanilha(dados);
+    aplicarPecasDaPlanilha(dados);
 
     meta = { arquivo: nomeArquivo, importadoEm: new Date().toISOString() };
     salvar();

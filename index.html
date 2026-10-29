@@ -22,6 +22,7 @@
             </div>
             <div class="actions">
                 <button class="btn" onclick="importarDados()">Atualizar vendas</button>
+                <button class="btn ghost hidden" id="btnRelatorio" onclick="abrirRelatorio()">Gerar relatório (PDF)</button>
                 <button class="btn ghost hidden" id="btnLimpar" onclick="limparDados()">Limpar dados</button>
             </div>
         </div>
@@ -158,11 +159,50 @@
         </div>
     </dialog>
 
+    <dialog class="obsDialog" id="pecaDialog">
+        <h3>Dados da peça</h3>
+        <p class="obsInfo" id="pecaInfo"></p>
+        <div class="pecaCampos" id="pecaCampos"></div>
+        <p class="obsQuando" id="pecaQuando"></p>
+        <div class="obsBtns">
+            <button class="btn ghost" id="pecaCancelar">Cancelar</button>
+            <button class="btn" id="pecaSalvar">Salvar dados da peça</button>
+        </div>
+    </dialog>
+
+    <dialog class="obsDialog relDialog" id="relDialog">
+        <h3>Gerar relatório em PDF</h3>
+        <p class="obsInfo">A janela abre com os filtros que estão na tela. Ajuste o que quiser antes de gerar.</p>
+        <div class="relGrid">
+            <div class="f"><label for="rDe">De</label><input type="text" id="rDe" placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10"></div>
+            <div class="f"><label for="rAte">Até</label><input type="text" id="rAte" placeholder="dd/mm/aaaa" inputmode="numeric" maxlength="10"></div>
+            <div class="f"><label for="rStatus">Situação</label><select id="rStatus"></select></div>
+            <div class="f"><label for="rFaixa">Tempo desde a venda</label><select id="rFaixa"></select></div>
+            <div class="f"><label for="rVend">Vendedor</label><select id="rVend"></select></div>
+            <div class="f"><label for="rMarca">Marca</label><select id="rMarca"></select></div>
+            <div class="f relWide"><label for="rCliente">Cliente</label><select id="rCliente"></select></div>
+            <div class="f relWide"><label for="rBusca">Buscar cliente, peça, nº da venda ou observação</label><input type="search" id="rBusca" placeholder="Ex.: Dunga, embreagem, 12345678"></div>
+        </div>
+        <div class="relLinks">
+            <button class="lnk" id="relTela">Usar filtros da tela</button>
+            <button class="lnk" id="relLimpar">Limpar filtros</button>
+        </div>
+        <h4 class="relSub">O que entra no relatório</h4>
+        <div class="relSecoes" id="rSecoes"></div>
+        <p class="relContagem" id="relContagem"></p>
+        <div class="obsBtns">
+            <button class="btn ghost" id="relCancelar">Cancelar</button>
+            <button class="btn" id="relGerar">Baixar PDF</button>
+        </div>
+    </dialog>
+
     <div class="toast" id="toast"></div>
 
     <!-- Bibliotecas -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
     <!-- Scripts do sistema (a ordem importa: app.js sempre por último) -->
     <script src="js/config.js"></script>
@@ -175,6 +215,8 @@
     <script src="js/graficos.js"></script>
     <script src="js/tabela.js"></script>
     <script src="js/acompanhamento.js"></script>
+    <script src="js/pecas.js"></script>
+    <script src="js/relatorio.js"></script>
     <script src="js/app.js"></script>
 </body>
 

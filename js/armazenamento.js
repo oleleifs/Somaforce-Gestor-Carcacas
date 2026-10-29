@@ -82,5 +82,6 @@ function limparDados() {
     document.getElementById('dash').classList.add('hidden');
     document.getElementById('empty').classList.remove('hidden');
     document.getElementById('btnLimpar').classList.add('hidden');
+    document.getElementById('btnRelatorio').classList.add('hidden');
     document.getElementById('metaImport').textContent = '';
 }

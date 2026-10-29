@@ -15,6 +15,13 @@ const COLS_TABELA = [
     { campo: 'obs',      titulo: 'Observação' }
 ];
 
+// Linha com os dados memorizados da peça (ou convite para cadastrar)
+function celulaSpecs(r, id) {
+    if (!chavePeca(r)) return '';
+    const resumo = resumoSpecs(r);
+    return `<button class="specBtn${resumo ? '' : ' vazio'}" data-acao="peca" data-id="${id}" title="${resumo ? 'Editar dados desta peça' : 'Cadastrar dados desta peça'}">${resumo ? esc(resumo) : '+ medidas'}</button>`;
+}
+
 function valorOrdem(r, campo) {
     if (campo === 'status') return STATUS_ORDEM.indexOf(statusDe(r));
     if (campo === 'obs') return obsDe(r);
@@ -62,7 +69,7 @@ function renderTabela() {
             <td class="num">${fmtData(r.data)}</td>
             <td class="num">${esc(r.venda)}</td>
             <td>${esc(r.cliente)}${r.codCliente ? `<span class="sub">Cód. ${esc(r.codCliente)}</span>` : ''}</td>
-            <td>${esc(r.peca)}${r.codPeca ? `<span class="sub">Cód. ${esc(r.codPeca)}</span>` : ''}</td>
+            <td>${esc(r.peca)}${r.codPeca ? `<span class="sub">Cód. ${esc(r.codPeca)}</span>` : ''}${celulaSpecs(r, id)}</td>
             <td>${esc(r.marca)}</td>
             <td>${esc(r.vendedor)}</td>
             <td class="num"><span class="days" style="background:${f.hex}33;color:${f.id === 'f1' ? '#ccc' : '#fff'};border:1px solid ${f.hex}">${r.dias}</span></td>
@@ -104,18 +111,19 @@ function serialExcel(d) {
 function exportarXLSX() {
     if (!filtrados.length) { toast('Nenhuma venda no filtro atual para exportar.', true); return; }
 
-    const cab = ['Data', 'Nº Venda', 'Cód. Cliente', 'Nome Cliente', 'Cód. Peça', 'Nome Peça', 'Marca', 'Vendedor', 'Dias desde a venda', 'Situação', 'Observação'];
+    const cab = ['Data', 'Nº Venda', 'Cód. Cliente', 'Nome Cliente', 'Cód. Peça', 'Nome Peça', ...CAMPOS_PECA.map(c => c.titulo), 'Marca', 'Vendedor', 'Dias desde a venda', 'Situação', 'Observação'];
     const txt = v => ({ t: 's', v: v == null ? '' : String(v) }); // códigos como texto: preserva zeros à esquerda
     const linhas = filtrados.map(r => [
         r.data ? { t: 'n', v: serialExcel(r.data), z: 'dd/mm/yyyy' } : txt(''),
         txt(r.venda), txt(r.codCliente), txt(r.cliente), txt(r.codPeca), txt(r.peca),
+        ...CAMPOS_PECA.map(c => valorSpecCelula(specsDe(r)[c.campo])),
         txt(r.marca), txt(r.vendedor),
         { t: 'n', v: r.dias },
         txt(STATUS[statusDe(r)].label), txt(obsDe(r))
     ]);
 
     const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
-    ws['!cols'] = [12, 12, 12, 36, 14, 36, 16, 20, 10, 14, 40].map(wch => ({ wch }));
+    ws['!cols'] = [12, 12, 12, 36, 14, 36, ...CAMPOS_PECA.map(() => 14), 16, 20, 10, 14, 40].map(wch => ({ wch }));
     ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: linhas.length, c: cab.length - 1 } }) };
 
     const wb = XLSX.utils.book_new();
