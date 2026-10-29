@@ -1,6 +1,6 @@
 /* =========================================================
    TABELA
-   Listagem de vendas, ordenação, paginação e exportação CSV.
+   Listagem de vendas, ordenação, paginação e exportação XLSX.
    ========================================================= */
 
 const COLS_TABELA = [
@@ -94,15 +94,31 @@ function ordenar(campo) {
     renderTabela();
 }
 
-/* ---------- Exportar CSV do filtro atual ---------- */
-function exportarCSV() {
-    const cab = ['Data', 'Num Venda', 'Cod Cliente', 'Nome Cliente', 'Cod Peca', 'Nome Peca', 'Marca', 'Vendedor', 'Dias desde a venda', 'Situacao', 'Observacao'];
-    const q = v => `"${String(v).replace(/"/g, '""')}"`;
-    const linhas = filtrados.map(r => [fmtData(r.data), r.venda, r.codCliente, r.cliente, r.codPeca, r.peca, r.marca, r.vendedor, r.dias, STATUS[statusDe(r)].label, obsDe(r)].map(q).join(';'));
-    const blob = new Blob(['\uFEFF' + [cab.map(q).join(';'), ...linhas].join('\r\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `carcacas_${isoDia(new Date())}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+/* ---------- Exportar XLSX do filtro atual ---------- */
+// Data vai como data de verdade do Excel (número serial + formato dd/mm/aaaa),
+// e não como texto — assim o Excel nunca confunde dia e mês, seja qual for o idioma.
+function serialExcel(d) {
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5 + 25569;
+}
+
+function exportarXLSX() {
+    if (!filtrados.length) { toast('Nenhuma venda no filtro atual para exportar.', true); return; }
+
+    const cab = ['Data', 'Nº Venda', 'Cód. Cliente', 'Nome Cliente', 'Cód. Peça', 'Nome Peça', 'Marca', 'Vendedor', 'Dias desde a venda', 'Situação', 'Observação'];
+    const txt = v => ({ t: 's', v: v == null ? '' : String(v) }); // códigos como texto: preserva zeros à esquerda
+    const linhas = filtrados.map(r => [
+        r.data ? { t: 'n', v: serialExcel(r.data), z: 'dd/mm/yyyy' } : txt(''),
+        txt(r.venda), txt(r.codCliente), txt(r.cliente), txt(r.codPeca), txt(r.peca),
+        txt(r.marca), txt(r.vendedor),
+        { t: 'n', v: r.dias },
+        txt(STATUS[statusDe(r)].label), txt(obsDe(r))
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
+    ws['!cols'] = [12, 12, 12, 36, 14, 36, 16, 20, 10, 14, 40].map(wch => ({ wch }));
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: linhas.length, c: cab.length - 1 } }) };
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Carcaças');
+    XLSX.writeFile(wb, `carcacas_${isoDia(new Date())}.xlsx`);
 }

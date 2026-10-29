@@ -16,7 +16,10 @@ function lerArquivo(file) {
     const reader = new FileReader();
     reader.onload = e => {
         try {
-            const workbook = XLSX.read(e.target.result, { type: 'array' });
+            // Em CSV, raw: true impede o SheetJS de "adivinhar" datas no padrão americano (mm/dd);
+            // o texto chega cru e o paraData() lê como dd/mm/aaaa.
+            const ehCSV = /\.csv$/i.test(file.name);
+            const workbook = XLSX.read(e.target.result, { type: 'array', raw: ehCSV });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const bruto = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: true });
             processExcelData(bruto, file.name);
