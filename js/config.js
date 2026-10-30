@@ -24,12 +24,13 @@ const OBRIGATORIAS = ['cliente', 'peca', 'vendedor', 'data'];
 
 // Dados técnicos memorizados por código de peça (cadastro de peças).
 // Para acrescentar um campo novo, basta incluir uma linha aqui:
-//   campo: nome interno · titulo: nome na tela e na exportação · unidade: aparece ao lado do valor
+//   campo: nome interno · titulo: nome na tela e na exportação (igual ao cabeçalho da planilha)
+//   unidade: aparece depois do valor ("120" vira "120 mm") · prefixo: aparece antes ("Ref. 6612")
 //   aliases: nomes aceitos se a coluna vier na planilha importada
 const CAMPOS_PECA = [
     { campo: 'mmCasco', titulo: 'MM do casco',      unidade: 'mm', exemplo: 'Ex.: 120',
       aliases: ['mmcasco', 'mmdocasco', 'medidacasco', 'diametrocasco', 'casco'] },
-    { campo: 'nmRef',   titulo: 'Nm de referência', unidade: 'Nm', exemplo: 'Ex.: 45',
+    { campo: 'nmRef',   titulo: 'Nm de referência', prefixo: 'Ref.', exemplo: 'Ex.: 6612',
       aliases: ['nmreferencia', 'nmdereferencia', 'nmref', 'nm', 'torquereferencia', 'torque'] }
 ];
 const PECAS_KEY = STORAGE_KEY + '_pecas';
@@ -43,6 +44,11 @@ const COLUNAS_NUMEROS = {
     telefone:   ['numero', 'telefone', 'fone', 'celular', 'whatsapp', 'whats', 'contato', 'tel']
 };
 const NUMEROS_KEY = STORAGE_KEY + '_numeros';
+
+// Planilha Google ligada ao site (planilha.js + apps-script/Codigo.gs)
+const PLANILHA_KEY = STORAGE_KEY + '_planilha';
+const COL_ID_PLANILHA = 'ID (não editar)';   // mesma coluna do Apps Script
+const INTERVALO_SYNC = 30000;                // busca novidades da planilha a cada 30 s
 
 // Situações possíveis de cada venda (sem registro = pendente)
 const STATUS = {

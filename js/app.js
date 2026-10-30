@@ -48,5 +48,16 @@ document.getElementById('relLimpar').addEventListener('click', limparFiltrosRela
 montarCamposPeca();
 carregarPecas();
 carregarNumeros();
-carregarAcomp();
-if (carregar()) montarDashboard();
+// Planilha Google
+document.getElementById('plConectar').addEventListener('click', conectarPlanilha);
+document.getElementById('plCancelar').addEventListener('click', () => document.getElementById('planilhaDialog').close());
+document.getElementById('plCopiar').addEventListener('click', copiarLinkEquipe);
+document.getElementById('plDesconectar').addEventListener('click', desconectarPlanilha);
+['plUrl', 'plChave'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') conectarPlanilha(); }));
+
+// Ligado à planilha Google: os dados vêm de lá. Senão, usa o que foi importado neste navegador.
+if (!iniciarPlanilha()) {
+    carregarAcomp();
+    if (carregar()) montarDashboard();
+    renderStatusPlanilha();
+}

@@ -13,6 +13,10 @@ inputArquivo.addEventListener('change', e => {
 function importarDados() { inputArquivo.click(); }
 
 function lerArquivo(file) {
+    if (modoPlanilha) {
+        toast('O site está ligado à planilha Google: as vendas vêm de lá. Para importar um arquivo, desconecte a planilha.', true);
+        return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
         try {
@@ -47,8 +51,10 @@ function lerArquivo(file) {
     reader.readAsArrayBuffer(file);
 }
 
-function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
-    if (!bruto.length) { toast('A planilha está vazia.', true); return; }
+// Converte as linhas cruas da aba de vendas (objetos { cabeçalho: valor }) nas linhas do sistema.
+// Usado tanto na importação de arquivo quanto na planilha Google (planilha.js).
+function lerLinhasVendas(bruto) {
+    if (!bruto.length) return { erro: 'A planilha está vazia.' };
 
     // Mapeia cabeçalhos da planilha -> campos internos
     const cabecalhos = new Set();
@@ -64,15 +70,12 @@ function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
     const nNumVendas = importarNumerosDasVendas(bruto, cabecalhos, { ...mapa, ...mapaPeca });
 
     const faltando = OBRIGATORIAS.filter(c => !mapa[c]);
-    if (faltando.length) {
-        toast('Colunas não encontradas: ' + faltando.join(', ') + '. Confira o cabeçalho da planilha.', true);
-        return;
-    }
+    if (faltando.length) return { erro: 'Colunas não encontradas: ' + faltando.join(', ') + '. Confira o cabeçalho da planilha.' };
 
     const hoje = inicioDoDia(new Date());
     let descartadas = 0;
 
-    dados = bruto.map(l => {
+    const linhas = bruto.map(l => {
         const data = paraData(l[mapa.data]);
         if (!data) { descartadas++; return null; }
         return {
@@ -87,9 +90,19 @@ function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
             dias: Math.max(0, Math.round((hoje - data) / 864e5)),
             _status: texto(l[mapa.status]),
             _obs: texto(l[mapa.obs]),
-            _specs: Object.fromEntries(Object.entries(mapaPeca).map(([campo, h]) => [campo, textoSpec(l[h])]))
+            _specs: Object.fromEntries(Object.entries(mapaPeca).map(([campo, h]) => [campo, textoSpec(l[h])])),
+            _idPlanilha: texto(l[COL_ID_PLANILHA])
         };
     }).filter(Boolean);
+    return { linhas, descartadas, mapa, mapaPeca, nNumVendas };
+}
+
+function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
+    const res = lerLinhasVendas(bruto);
+    if (res.erro) { toast(res.erro, true); return; }
+    const { descartadas, nNumVendas } = res;
+    dados = res.linhas;
+    dados.forEach(r => delete r._idPlanilha);
     gerarIds(dados);
     aplicarAcompDaPlanilha(dados);
     aplicarPecasDaPlanilha(dados);

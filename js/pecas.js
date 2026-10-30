@@ -24,12 +24,12 @@ function comUnidade(v, unidade) {
     return normalizar(v).endsWith(normalizar(unidade)) ? String(v) : `${v} ${unidade}`;
 }
 
-// Resumo curto para a tabela: "120 mm · 45 Nm"
+// Resumo curto para a tabela: "380MM · Ref. 6612"
 function resumoSpecs(r) {
     const s = specsDe(r);
     return CAMPOS_PECA
         .filter(c => s[c.campo])
-        .map(c => comUnidade(s[c.campo], c.unidade))
+        .map(c => (c.prefixo ? c.prefixo + ' ' : '') + comUnidade(s[c.campo], c.unidade))
         .join(' · ');
 }
 
@@ -42,6 +42,7 @@ function gravarSpecs(chave, valores) {
 }
 
 function salvarPecas() {
+    if (modoPlanilha) return;
     try { localStorage.setItem(PECAS_KEY, JSON.stringify(pecas)); }
     catch (e) { toast('Não foi possível salvar o cadastro de peças no navegador.', true); }
 }
@@ -111,7 +112,8 @@ function abrirPeca(id) {
     const qtd = dados.filter(x => chavePeca(x) === chave).length;
     document.getElementById('pecaInfo').textContent =
         `${r.codPeca ? `Cód. ${r.codPeca} — ` : ''}${r.peca}. ` +
-        `Vale para ${qtd} ${qtd === 1 ? 'venda' : 'vendas'} desta peça, e para as próximas importações.`;
+        `Vale para ${qtd} ${qtd === 1 ? 'venda' : 'vendas'} desta peça` +
+        (modoPlanilha ? ' e é gravado em todas as linhas dela na planilha Google.' : ', e para as próximas importações.');
 
     const s = specsDe(r);
     document.querySelectorAll('#pecaCampos input').forEach(i => { i.value = s[i.dataset.campo] || ''; });
@@ -128,6 +130,7 @@ function salvarPeca() {
     document.querySelectorAll('#pecaCampos input').forEach(i => { valores[i.dataset.campo] = i.value.trim(); });
     gravarSpecs(pecaChave, valores);
     salvarPecas();
+    planilhaPeca(pecaChave, valores);
     document.getElementById('pecaDialog').close();
     toast('Dados da peça salvos.');
     atualizar();

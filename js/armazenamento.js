@@ -4,6 +4,7 @@
    ========================================================= */
 
 function salvar() {
+    if (modoPlanilha) return;
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             meta,
@@ -50,6 +51,7 @@ function aplicarAcompDaPlanilha(linhas) {
 }
 
 function salvarAcomp() {
+    if (modoPlanilha) return;
     try { localStorage.setItem(ACOMP_KEY, JSON.stringify(acomp)); }
     catch (e) { toast('Não foi possível salvar no navegador.', true); }
 }

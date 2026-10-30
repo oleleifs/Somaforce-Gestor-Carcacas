@@ -8,6 +8,7 @@
 let numeros = {}; // { codCliente: ['48999998888', ...] }
 
 function salvarNumeros() {
+    if (modoPlanilha) return;
     try { localStorage.setItem(NUMEROS_KEY, JSON.stringify(numeros)); }
     catch (e) { toast('Não foi possível salvar os números no navegador.', true); }
 }

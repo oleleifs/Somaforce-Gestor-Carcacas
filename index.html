@@ -21,7 +21,9 @@
                 <p class="meta" id="metaImport"></p>
             </div>
             <div class="actions">
-                <button class="btn" onclick="importarDados()">Atualizar vendas</button>
+                <button class="btn" id="btnImportar" onclick="importarDados()">Atualizar vendas</button>
+                <button class="btn hidden" id="btnSync" onclick="sincronizar(true)">Sincronizar agora</button>
+                <button class="btn ghost" id="btnPlanilha" onclick="abrirPlanilhaDialog()"><i class="dot" aria-hidden="true"></i>Planilha Google</button>
                 <button class="btn ghost hidden" id="btnRelatorio" onclick="abrirRelatorio()">Gerar relatório (PDF)</button>
                 <button class="btn ghost hidden" id="btnLimpar" onclick="limparDados()">Limpar dados</button>
             </div>
@@ -36,7 +38,11 @@
             <h2>Nenhuma venda carregada</h2>
             <p>Importe a planilha de vendas de carcaças (.xlsx) para gerar o painel. Você também pode arrastar o arquivo
                 para esta tela.</p>
-            <button class="btn" onclick="importarDados()">Importar planilha</button>
+            <p class="emptyMsg" id="emptyMsg"></p>
+            <div class="emptyBtns">
+                <button class="btn" id="emptyImportar" onclick="importarDados()">Importar planilha</button>
+                <button class="btn ghost" onclick="abrirPlanilhaDialog()">Conectar planilha Google</button>
+            </div>
         </section>
 
         <!-- Dashboard -->
@@ -196,6 +202,28 @@
         </div>
     </dialog>
 
+    <dialog class="obsDialog plDialog" id="planilhaDialog">
+        <h3>Planilha Google</h3>
+        <p class="obsInfo">Ligue o site a uma planilha do Google Sheets: o que mudar lá aparece aqui, e situação,
+            observação e medidas alteradas aqui são gravadas lá. Veja como publicar o script em
+            <b>apps-script/LEIA-ME.md</b>.</p>
+        <div class="f"><label for="plUrl">Link do App da Web (Apps Script)</label>
+            <input type="url" id="plUrl" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false"></div>
+        <div class="f plChave"><label for="plChave">Chave de acesso</label>
+            <input type="password" id="plChave" placeholder="A mesma CHAVE escrita no script" autocomplete="off"></div>
+        <p class="plErro" id="plErro" role="alert"></p>
+        <div class="plConectada hidden" id="plConectada">
+            <div class="f"><label for="plLink">Link para a equipe (já entra conectado)</label>
+                <div class="plLinkRow"><input type="text" id="plLink" readonly>
+                    <button class="btn ghost" id="plCopiar">Copiar</button></div></div>
+            <button class="lnk" id="plDesconectar">Desconectar este navegador da planilha</button>
+        </div>
+        <div class="obsBtns">
+            <button class="btn ghost" id="plCancelar">Fechar</button>
+            <button class="btn" id="plConectar">Conectar</button>
+        </div>
+    </dialog>
+
     <div class="toast" id="toast"></div>
 
     <!-- Bibliotecas -->
@@ -218,6 +246,7 @@
     <script src="js/pecas.js"></script>
     <script src="js/clientes.js"></script>
     <script src="js/relatorio.js"></script>
+    <script src="js/planilha.js"></script>
     <script src="js/app.js"></script>
 </body>
 

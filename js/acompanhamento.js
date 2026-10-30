@@ -17,6 +17,7 @@ function registrar(id, mudancas) {
 function setStatus(ids, status) {
     ids.forEach(id => registrar(id, { status }));
     salvarAcomp();
+    planilhaStatus(ids, status);
     const n = ids.length;
     const txt = { pendente: 'marcada(s) como pendente', andamento: 'marcada(s) como em andamento', concluida: 'marcada(s) como concluída', excluida: 'excluída(s). Veja na aba Excluídas para restaurar' }[status];
     toast(`${n} ${n === 1 ? 'venda' : 'vendas'} ${txt}.`);
@@ -66,8 +67,10 @@ function abrirObs(id) {
 
 function salvarObs() {
     if (!obsId) return;
-    registrar(obsId, { obs: document.getElementById('obsTexto').value.trim() });
+    const texto = document.getElementById('obsTexto').value.trim();
+    registrar(obsId, { obs: texto });
     salvarAcomp();
+    planilhaObs(obsId, texto);
     document.getElementById('obsDialog').close();
     toast('Observação salva.');
     atualizar();

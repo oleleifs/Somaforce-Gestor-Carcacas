@@ -1130,3 +1130,83 @@ th.chk input {
     color: #fff;
     text-decoration: underline;
 }
+
+/* ---------- Planilha Google ---------- */
+#btnPlanilha .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background: #5a5a5a;
+    vertical-align: middle;
+}
+
+#btnPlanilha.on .dot {
+    background: #3fb950;
+    box-shadow: 0 0 0 3px rgba(63, 185, 80, .18);
+}
+
+#btnPlanilha.on.erro .dot {
+    background: #e6b35c;
+    box-shadow: 0 0 0 3px rgba(230, 179, 92, .18);
+}
+
+.metaErro {
+    color: #e6b35c !important;
+}
+
+.emptyMsg:empty {
+    display: none;
+}
+
+.emptyMsg {
+    color: #e6b35c;
+}
+
+.emptyBtns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.plDialog {
+    width: min(600px, calc(100% - 32px));
+}
+
+.plDialog .f {
+    margin-top: 12px;
+}
+
+.plErro {
+    color: var(--red3);
+    font-size: .84rem;
+    margin-top: 10px;
+}
+
+.plErro:empty {
+    display: none;
+}
+
+.plConectada {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+}
+
+.plLinkRow {
+    display: flex;
+    gap: 8px;
+}
+
+.plLinkRow input {
+    flex: 1;
+    min-width: 0;
+    color: #bbb !important;
+    font-size: .8rem !important;
+}
+
+.plConectada .lnk {
+    margin-top: 12px;
+}
