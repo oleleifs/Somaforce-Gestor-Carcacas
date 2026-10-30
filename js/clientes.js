@@ -35,8 +35,8 @@ function limparTelefone(v) {
 // Uma célula pode trazer mais de um número: "48 99999-8888 / 48 3524-0000"
 function telefonesDaCelula(v) {
     if (v == null || v === '') return [];
-    if (typeof v === 'number') return [limparTelefone(v)].filter(Boolean);
-    return String(v).split(/[\/;,|\n]+/).map(limparTelefone).filter(d => d.length >= 8);
+    const partes = typeof v === 'number' ? [v] : String(v).split(/[\/;,|\n]+/);
+    return partes.map(limparTelefone).filter(d => d.length >= 8);
 }
 
 function formatarTelefone(d) {
@@ -47,15 +47,49 @@ function formatarTelefone(d) {
     return d;
 }
 
-// Celular com DDD (11 dígitos, começando com 9) abre no WhatsApp
+// Celular com DDD abre no WhatsApp. Celular no formato antigo, sem o 9
+// (ex.: 51 8593-0775), ganha o 9 no link: 55 51 98593-0775.
 function linkWhatsApp(d) {
-    return d.length === 11 && d[2] === '9' ? `https://wa.me/55${d}` : '';
+    if (d.length === 11 && d[2] === '9') return `https://wa.me/55${d}`;
+    if (d.length === 10 && '6789'.includes(d[2])) return `https://wa.me/55${d.slice(0, 2)}9${d.slice(2)}`;
+    return '';
 }
 
 function textoNumeros(r) { return numerosDe(r).map(formatarTelefone).join(' / '); }
 
-// Lê a aba de números. Cliente que aparece na aba tem os números substituídos;
-// quem não aparece mantém o que já estava salvo.
+// Junta os telefones por cliente e grava no cadastro. Cliente que aparece com número
+// tem os números substituídos; quem não aparece (ou está sem número) mantém o que já estava salvo.
+function gravarNumerosDasLinhas(linhas, colCod, colsTel) {
+    const novos = {};
+    linhas.forEach(l => {
+        const cod = paraId(l[colCod]);
+        if (!cod) return;
+        const tels = colsTel.flatMap(h => telefonesDaCelula(l[h]));
+        if (!tels.length) return;
+        novos[cod] = [...new Set([...(novos[cod] || []), ...tels])];
+    });
+    if (Object.keys(novos).length) { Object.assign(numeros, novos); salvarNumeros(); }
+    return Object.keys(novos).length;
+}
+
+// Colunas de telefone: cabeçalho começa com "Número", "Telefone", "Celular"... e não é de venda/pedido/nota
+function colunasTelefone(cabecalhos, ignorar = []) {
+    return cabecalhos.filter(h => {
+        if (ignorar.includes(h)) return false;
+        const n = normalizar(h);
+        if (/venda|pedido|nota|nf|serie|lote/.test(n)) return false;
+        return COLUNAS_NUMEROS.telefone.some(a => n.startsWith(a));
+    });
+}
+
+// Coluna de telefone dentro da própria aba de vendas (ex.: "Números" ao lado de "Observação")
+function importarNumerosDasVendas(bruto, cabecalhos, mapa) {
+    if (!mapa.codCliente) return 0;
+    const cols = colunasTelefone([...cabecalhos], Object.values(mapa));
+    return cols.length ? gravarNumerosDasLinhas(bruto, mapa.codCliente, cols) : 0;
+}
+
+// Lê uma aba separada de números (código do cliente + telefone)
 function importarAbaNumeros(linhas) {
     if (!linhas.length) return { clientes: 0, semColuna: false };
     const cabecalhos = new Set();
@@ -65,20 +99,9 @@ function importarAbaNumeros(linhas) {
     // Respeita a ordem dos nomes no config: "Cód. Cliente" ganha de "Cliente"
     let colCod;
     for (const a of COLUNAS_NUMEROS.codCliente) { colCod = hs.find(h => normalizar(h) === a); if (colCod) break; }
-    const colsTel = hs.filter(h => h !== colCod && COLUNAS_NUMEROS.telefone.some(a => normalizar(h).startsWith(a)));
+    const colsTel = colunasTelefone(hs, [colCod]);
     if (!colCod || !colsTel.length) return { clientes: 0, semColuna: true };
-
-    const novos = {};
-    linhas.forEach(l => {
-        const cod = paraId(l[colCod]);
-        if (!cod) return;
-        const tels = colsTel.flatMap(h => telefonesDaCelula(l[h]));
-        if (!tels.length) return;
-        novos[cod] = [...new Set([...(novos[cod] || []), ...tels])];
-    });
-    Object.assign(numeros, novos);
-    salvarNumeros();
-    return { clientes: Object.keys(novos).length, semColuna: false };
+    return { clientes: gravarNumerosDasLinhas(linhas, colCod, colsTel), semColuna: false };
 }
 
 // Linha da tabela abaixo do nome do cliente

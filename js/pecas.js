@@ -18,12 +18,18 @@ function specsDe(r) { return pecas[chavePeca(r)] || {}; }
 
 function temSpecs(spec) { return CAMPOS_PECA.some(c => spec[c.campo]); }
 
+// Valor com unidade, sem repetir quando a planilha já traz ("380MM" fica "380MM", "120" vira "120 mm")
+function comUnidade(v, unidade) {
+    if (!unidade) return String(v);
+    return normalizar(v).endsWith(normalizar(unidade)) ? String(v) : `${v} ${unidade}`;
+}
+
 // Resumo curto para a tabela: "120 mm · 45 Nm"
 function resumoSpecs(r) {
     const s = specsDe(r);
     return CAMPOS_PECA
         .filter(c => s[c.campo])
-        .map(c => c.unidade ? `${s[c.campo]} ${c.unidade}` : s[c.campo])
+        .map(c => comUnidade(s[c.campo], c.unidade))
         .join(' · ');
 }
 

@@ -61,6 +61,7 @@ function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
     }
 
     const mapaPeca = mapearColunasPeca(cabecalhos);
+    const nNumVendas = importarNumerosDasVendas(bruto, cabecalhos, { ...mapa, ...mapaPeca });
 
     const faltando = OBRIGATORIAS.filter(c => !mapa[c]);
     if (faltando.length) {
@@ -100,6 +101,7 @@ function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
 
     let msg = `${dados.length} ${dados.length === 1 ? 'linha importada' : 'linhas importadas'}.`;
     if (descartadas) msg += ` ${descartadas} sem data válida foram ignoradas.`;
+    if (nNumVendas && !avisoExtra) msg += ` ${nNumVendas} ${nNumVendas === 1 ? 'cliente' : 'clientes'} com número.`;
     toast(msg + avisoExtra);
 }
 

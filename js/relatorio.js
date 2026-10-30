@@ -248,7 +248,7 @@ function gerarRelatorioPDF() {
         const nSpec = CAMPOS_PECA.length;
         tabela(['Cód.', 'Peça', ...CAMPOS_PECA.map(c => c.titulo), 'Total', 'Em aberto', 'Abertas +90 dias'],
             grupos.map(g => [g.linha.codPeca || '-', g.nome,
-                ...CAMPOS_PECA.map(c => { const v = specsDe(g.linha)[c.campo]; return v ? `${v}${c.unidade ? ' ' + c.unidade : ''}` : '-'; }),
+                ...CAMPOS_PECA.map(c => { const v = specsDe(g.linha)[c.campo]; return v ? comUnidade(v, c.unidade) : '-'; }),
                 n(g.total), n(g.pendente + g.andamento), n(g.velhas)]),
             { columnStyles: { 0: { cellWidth: 24 }, ...colsNum(2 + nSpec, 4 + nSpec) }, ...destaque90(4 + nSpec) });
     }
