@@ -20,9 +20,25 @@ function lerArquivo(file) {
             // o texto chega cru e o paraData() lê como dd/mm/aaaa.
             const ehCSV = /\.csv$/i.test(file.name);
             const workbook = XLSX.read(e.target.result, { type: 'array', raw: ehCSV });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const bruto = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: true });
-            processExcelData(bruto, file.name);
+            const ler = nome => XLSX.utils.sheet_to_json(workbook.Sheets[nome], { defval: null, raw: true });
+
+            // Aba de números dos clientes (opcional) e aba de vendas (a primeira que não for a de números)
+            const abaNum = workbook.SheetNames.find(ehAbaNumeros);
+            const abaVendas = workbook.SheetNames.find(n => n !== abaNum);
+            let avisoNum = '';
+            if (abaNum) {
+                const res = importarAbaNumeros(ler(abaNum));
+                avisoNum = res.semColuna
+                    ? ` Aba "${abaNum}": não encontrei as colunas de código do cliente e telefone.`
+                    : ` ${res.clientes} ${res.clientes === 1 ? 'cliente' : 'clientes'} com número na aba "${abaNum}".`;
+            }
+            if (!abaVendas) {
+                // Arquivo só com a aba de números: atualiza o cadastro e mantém as vendas atuais
+                toast(('Números atualizados.' + avisoNum).trim(), avisoNum.includes('não encontrei'));
+                if (dados.length) atualizar();
+                return;
+            }
+            processExcelData(ler(abaVendas), file.name, avisoNum);
         } catch (err) {
             console.error(err);
             toast('Não foi possível ler o arquivo. Confira se é uma planilha .xlsx válida.', true);
@@ -31,7 +47,7 @@ function lerArquivo(file) {
     reader.readAsArrayBuffer(file);
 }
 
-function processExcelData(bruto, nomeArquivo) {
+function processExcelData(bruto, nomeArquivo, avisoExtra = '') {
     if (!bruto.length) { toast('A planilha está vazia.', true); return; }
 
     // Mapeia cabeçalhos da planilha -> campos internos
@@ -84,7 +100,7 @@ function processExcelData(bruto, nomeArquivo) {
 
     let msg = `${dados.length} ${dados.length === 1 ? 'linha importada' : 'linhas importadas'}.`;
     if (descartadas) msg += ` ${descartadas} sem data válida foram ignoradas.`;
-    toast(msg);
+    toast(msg + avisoExtra);
 }
 
 // Arrastar e soltar o arquivo em qualquer lugar da página

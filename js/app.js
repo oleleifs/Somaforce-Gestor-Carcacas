@@ -47,5 +47,6 @@ document.getElementById('relLimpar').addEventListener('click', limparFiltrosRela
 
 montarCamposPeca();
 carregarPecas();
+carregarNumeros();
 carregarAcomp();
 if (carregar()) montarDashboard();

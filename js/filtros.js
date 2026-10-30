@@ -39,7 +39,7 @@ function filtrar(f) {
         if (f.cliente && r.cliente !== f.cliente) return false;
         if (f.faixa && faixaDe(r.dias).id !== f.faixa) return false;
         if (q) {
-            const alvo = normalizar(`${r.cliente} ${r.codCliente} ${r.peca} ${r.codPeca} ${r.venda} ${obsDe(r)}`);
+            const alvo = normalizar(`${r.cliente} ${r.codCliente} ${r.peca} ${r.codPeca} ${r.venda} ${obsDe(r)} ${numerosDe(r).join(' ')}`);
             if (!alvo.includes(q)) return false;
         }
         return true;

@@ -254,9 +254,9 @@ function gerarRelatorioPDF() {
     }
     if (secoes.has('clientes')) {
         titulo('Principais clientes (top 15)');
-        tabela(['Cód.', 'Cliente', ...cabGrupo],
-            agrupar(linhas, r => r.codCliente || r.cliente, r => r.cliente).slice(0, 15).map(g => [g.linha.codCliente || '-', g.nome, ...linhaGrupo(g)]),
-            { columnStyles: { 0: { cellWidth: 20 }, ...colsNum(2, 6) }, ...destaque90(6) });
+        tabela(['Cód.', 'Cliente', 'Telefone', ...cabGrupo],
+            agrupar(linhas, r => r.codCliente || r.cliente, r => r.cliente).slice(0, 15).map(g => [g.linha.codCliente || '-', g.nome, numerosDe(g.linha).map(formatarTelefone).join('\n') || '-', ...linhaGrupo(g)]),
+            { columnStyles: { 0: { cellWidth: 20 }, 2: { cellWidth: 42 }, ...colsNum(3, 7) }, ...destaque90(7) });
     }
     if (secoes.has('lista')) {
         titulo(`Lista de vendas (${n(linhas.length)})`);

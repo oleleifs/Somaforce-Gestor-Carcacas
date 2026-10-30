@@ -34,6 +34,16 @@ const CAMPOS_PECA = [
 ];
 const PECAS_KEY = STORAGE_KEY + '_pecas';
 
+// Aba de números dos clientes (telefones), vinculada pelo código do cliente.
+// ABA_NUMEROS: nomes aceitos para a aba (basta começar com um deles: "Números", "Telefones 2026"...)
+// COLUNAS_NUMEROS.telefone: basta o cabeçalho começar com um deles ("Telefone 2", "Celular comprador"...)
+const ABA_NUMEROS = ['numero', 'telefone', 'contato', 'fone'];
+const COLUNAS_NUMEROS = {
+    codCliente: ['codcliente', 'codigocliente', 'codcli', 'codigo', 'cod', 'cliente'],
+    telefone:   ['numero', 'telefone', 'fone', 'celular', 'whatsapp', 'whats', 'contato', 'tel']
+};
+const NUMEROS_KEY = STORAGE_KEY + '_numeros';
+
 // Situações possíveis de cada venda (sem registro = pendente)
 const STATUS = {
     pendente:  { label: 'Pendente' },
