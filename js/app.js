@@ -8,6 +8,7 @@ configurarChartJs();
 [['fDe', 'de'], ['fAte', 'ate']].forEach(([id, campo]) => {
     const el = document.getElementById(id);
     mascaraData(el);
+    adicionarCalendario(el);
     el.addEventListener('input', () => {
         const v = el.value;
         // Só filtra com a data completa ou com o campo vazio
@@ -36,7 +37,7 @@ document.getElementById('pecaCancelar').addEventListener('click', () => document
 document.getElementById('pecaCampos').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); salvarPeca(); } });
 
 // Relatório
-['rDe', 'rAte'].forEach(id => mascaraData(document.getElementById(id)));
+['rDe', 'rAte'].forEach(id => { const el = document.getElementById(id); mascaraData(el); adicionarCalendario(el); });
 document.getElementById('relDialog').addEventListener('input', atualizarContagemRelatorio);
 document.getElementById('relDialog').addEventListener('change', atualizarContagemRelatorio);
 document.getElementById('relGerar').addEventListener('click', gerarRelatorioPDF);

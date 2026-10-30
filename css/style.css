@@ -1053,3 +1053,54 @@ th.chk input {
         grid-template-columns: 1fr;
     }
 }
+
+/* ---------- Calendário nos campos de data ---------- */
+.dataBox {
+    position: relative;
+    display: flex;
+}
+
+.dataBox > input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding-right: 40px;
+}
+
+.dataBtn {
+    all: unset;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    color: #9a9a9a;
+    cursor: pointer;
+}
+
+.dataBtn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .08);
+}
+
+.dataBtn:focus-visible {
+    outline: 2px solid var(--red3);
+    outline-offset: 1px;
+}
+
+/* Campo nativo invisível: só serve para abrir o calendário do navegador */
+.dataNativa {
+    position: absolute;
+    right: 5px;
+    bottom: 0;
+    width: 30px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    border: 0;
+    padding: 0;
+    color-scheme: dark;
+}

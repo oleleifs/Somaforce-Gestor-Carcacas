@@ -54,6 +54,44 @@ function mascaraData(el) {
     });
 }
 
+// Botão de calendário dentro de um campo de data em texto (dd/mm/aaaa).
+// Escolher no calendário preenche o campo e dispara o evento 'input', como se a pessoa tivesse digitado.
+const ICONE_CALENDARIO = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>';
+
+function adicionarCalendario(el) {
+    const caixa = document.createElement('div');
+    caixa.className = 'dataBox';
+    el.parentNode.insertBefore(caixa, el);
+    caixa.appendChild(el);
+
+    const nativo = document.createElement('input');
+    nativo.type = 'date';
+    nativo.className = 'dataNativa';
+    nativo.tabIndex = -1;
+    nativo.setAttribute('aria-hidden', 'true');
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dataBtn';
+    btn.title = 'Escolher no calendário';
+    btn.setAttribute('aria-label', 'Escolher data no calendário');
+    btn.innerHTML = ICONE_CALENDARIO;
+
+    caixa.append(nativo, btn);
+
+    btn.addEventListener('click', () => {
+        const d = el.value.length === 10 ? paraData(el.value) : null;
+        nativo.value = d ? isoDia(d) : '';
+        try { nativo.showPicker(); }
+        catch (e) { nativo.focus(); nativo.click(); }
+    });
+    nativo.addEventListener('change', () => {
+        el.value = nativo.value ? dataBR(nativo.value) : '';
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.focus();
+    });
+}
+
 const fmtData = d => dataBR(d);
 const fmtNum = n => n.toLocaleString('pt-BR');
 const isoDia = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
